@@ -1,36 +1,37 @@
 import io
+import spacy
 import streamlit as st
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-import nltk
-from nltk.corpus import stopwords
-from unidecode import unidecode
 from PIL import Image
 import numpy as np
 
-mask_image = np.array(Image.open('bogota.png'))
+# Load the mask image for the word cloud
+mask_image = np.array(Image.open("bogota.png"))
+
+# Function to generate and display a word cloud from text data
 def show_wordcloud(data):
+    # Create a WordCloud object with specified parameters
     wordcloud = WordCloud(
-        background_color = "#0E1117",
-        contour_width=0,
-        colormap='Paired',
-        max_words = 350,
-        max_font_size = 40, 
-        scale = 3,
-        random_state = 42,
+        background_color="#0E1117",
+        colormap="Paired",
+        max_words=350,
+        max_font_size=40,
+        scale=3,
+        random_state=42,
         mask=mask_image,
-        margin=1,
     ).generate(str(data))
 
-    fig = plt.figure(1, figsize = (10, 10))
-    plt.imshow(wordcloud, interpolation="bilinear")
+    # Create a plot of the word cloud
+    fig = plt.figure(1, figsize=(10, 10))
+    plt.imshow(wordcloud)
     plt.axis("off")
     plt.margins(x=0, y=0)
-    plt.tight_layout(pad = 0)
+    plt.tight_layout(pad=0)
 
-    # Convert plot to PNG image
+    # Convert the plot to a PNG image
     png = io.BytesIO()
-    plt.savefig(png, format='png', bbox_inches = 'tight', pad_inches = 0)
+    plt.savefig(png, format="png", bbox_inches="tight", pad_inches=0)
     plt.clf()
     png.seek(0)
     png_image = Image.open(png)
@@ -39,38 +40,46 @@ def show_wordcloud(data):
     st.image(png_image)
 
 
-nltk.download('stopwords')
-nltk.download('punkt')
-stop_words = set(stopwords.words('spanish'))
+# Load the Spanish language model for spaCy
+nlp = spacy.load("es_core_news_sm")
+
+# Function to preprocess text data for the word cloud
 def preprocess_text(text):
-    # Lowercasing the text
-    text = text.lower()
-    # Tokenizing the text
-    words = nltk.word_tokenize(text)
-    # Removing punctuation and stop words
-    words = [word for word in words if word.isalpha() and word not in stop_words]
-    # Removing accents
-    #words = [unidecode(word) for word in words]
+    # Parse the text with spaCy and extract relevant tokens
+    doc = nlp(text.lower())
+    words = [
+        token.text
+        for token in doc
+        if token.pos_ in ["VERB", "NOUN", "ADJ", "PROPN"]
+        and token.lemma_ not in "tener"
+        and token.text.lower() not in ["bogotá", "bogota", "ciudad"]
+    ]
+    # Join the extracted tokens into a single string
     return " ".join(words)
 
+
+# Configure the Streamlit page layout
 st.set_page_config(layout="wide")
-st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_option("deprecation.showPyplotGlobalUse", False)
 
-# Add a sidebar
-st.sidebar.title('Configuración')
-# List of file names
-file_names = {'Juan Daniel Oviedo': 'oviedo.txt',
-              'Carlos Fernando Galán': 'galan.txt',
-              'Diego Molano': 'molano.txt',
-              'Gustavo Bolivar': 'bolivar.txt'}
-selected_file = st.sidebar.selectbox('Escoja un candidato', file_names.keys())
-# Title of the app
-st.title('Elecciones Bogotá 2023')
-st.subheader(f'¿De qué habla {selected_file}?')
+# Add a sidebar for selecting a candidate file
+st.sidebar.title("Configuración")
+file_names = {
+    "Juan Daniel Oviedo": "oviedo.txt",
+    "Carlos Fernando Galán": "galan.txt",
+    "Diego Molano": "molano.txt",
+    "Gustavo Bolivar": "bolivar.txt",
+}
+selected_file = st.sidebar.selectbox("Escoja un candidato", file_names.keys())
 
-with open(file_names[selected_file], 'r', encoding='utf-8') as f:
+# Display the app title and selected candidate
+st.title("Elecciones Bogotá 2023")
+st.subheader(f"¿De qué habla {selected_file}?")
+
+# Load and preprocess the selected candidate's text data
+with open(file_names[selected_file], "r", encoding="utf-8") as f:
     f = f.read()
     f = preprocess_text(f)
- 
-#if st.sidebar.button("Generate Word Cloud"):
+
+# Generate and display a word cloud from the preprocessed text data
 show_wordcloud(f)
