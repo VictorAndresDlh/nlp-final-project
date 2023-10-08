@@ -1,7 +1,10 @@
+chromadb==0.4.13
 matplotlib==3.8.0
 numpy==1.26.0
+pandas==2.1.1
 Pillow==10.0.1
 Pillow==10.0.1
+sentence_transformers==2.2.2
 spacy==3.7.1
 streamlit==1.27.2
 wordcloud==1.9.2
