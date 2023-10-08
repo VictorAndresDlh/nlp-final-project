@@ -8,3 +8,4 @@ sentence_transformers==2.2.2
 spacy==3.7.1
 streamlit==1.27.2
 wordcloud==1.9.2
+pysqlite3-binary==0.5.2
