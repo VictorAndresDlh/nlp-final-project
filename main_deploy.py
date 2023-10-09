@@ -1,7 +1,8 @@
 __import__('pysqlite3')
 import sys
-import subprocess
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+import subprocess
 subprocess.run(["python", "-m", "spacy", "download", "es_core_news_sm"])
 
 import streamlit as st
