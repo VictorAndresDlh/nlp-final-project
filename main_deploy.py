@@ -3,7 +3,7 @@ import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import subprocess
-subprocess.run(["python", "-m", "spacy", "download", "es_core_news_sm"])
+subprocess.run("python -m spacy download es_core_news_sm", shell=True)
 
 import streamlit as st
 from vectordb import query
