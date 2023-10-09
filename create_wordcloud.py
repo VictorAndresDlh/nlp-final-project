@@ -4,12 +4,13 @@ import spacy
 import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
+import es_core_news_sm
 
 
 # Function to preprocess text data for the word cloud
 def preprocess_text(text):
     # Load the Spanish language model for spaCy
-    nlp = spacy.load("es_core_news_sm")
+    nlp = es_core_news_sm.load()
     # Parse the text with spaCy and extract relevant tokens
     doc = nlp(text.lower())
     words = [
