@@ -1,7 +1,7 @@
 # Chroma and SQLite3 workaround
-__import__('pysqlite3')
+__import__("pysqlite3")
 import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
 # Download the spaCy model for Spanish
 from spacy.cli.download import download
@@ -45,5 +45,4 @@ st.header(f"¿Qué dice {selected_file} sobre...?")
 text = st.text_input("Escribe un texto para buscar en las entrevistas y debates")
 if text:
     results = query(text)
-    st.markdown(results[0][0]['text'])
-    
+    st.markdown(results[0][0]["text"])
