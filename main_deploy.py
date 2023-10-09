@@ -1,9 +1,12 @@
+# Chroma and SQLite3 workaround
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-import subprocess
-subprocess.run("python -m spacy download es_core_news_sm", shell=True)
+# Download the spaCy model for Spanish
+from spacy.cli.download import download
+model_name = "es_core_news_sm"
+download(model_name)
 
 import streamlit as st
 from vectordb import query
