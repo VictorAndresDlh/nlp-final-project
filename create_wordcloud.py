@@ -6,8 +6,8 @@ from PIL import Image
 import numpy as np
 
 # Download the Spanish language model for spaCy
-import os
-os.system("python -m spacy download es_core_news_sm")
+from spacy.cli import download as spacy_download
+spacy_download("es_core_news_sm")
 
 # Function to preprocess text data for the word cloud
 def preprocess_text(text):
