@@ -3,10 +3,6 @@ __import__("pysqlite3")
 import sys
 sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
-# Download the spaCy model for Spanish
-import os
-os.system("python -m spacy download es_core_news_sm")
-
 import streamlit as st
 from vectordb import query
 from create_wordcloud import show_wordcloud
