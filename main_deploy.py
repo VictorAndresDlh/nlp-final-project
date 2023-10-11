@@ -4,9 +4,8 @@ import sys
 sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
 # Download the spaCy model for Spanish
-from spacy.cli.download import download
-model_name = "es_core_news_sm"
-download(model_name)
+import os
+os.system("python -m spacy download es_core_news_sm")
 
 import streamlit as st
 from vectordb import query
