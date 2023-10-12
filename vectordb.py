@@ -12,18 +12,20 @@ model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 # Create a new ChromaDB collection and add the data from the DataFrame to it
 client = chromadb.Client()
-collection = client.create_collection(
-    name="alcalde_bogota", metadata={"hnsw:space": "cosine"}
-)  # Create a new ChromaDB collection with the specified name and metadata
-
-collection.add(
-    ids=df["id_database"].tolist(),
-    embeddings=df["embeddings"].tolist(),
-    metadatas=df[
-        ["start", "end", "text", "views", "publish_date", "url", "title"]
-    ].to_dict("records"),
-)  # Add the data from the DataFrame to the ChromaDB collection
-
+try:
+    collection = client.create_collection(
+        name="alcalde_bogota", metadata={"hnsw:space": "cosine"}
+    ) # Create a new ChromaDB collection with the specified name and metadata
+    # Create the collection
+    collection.add(
+        ids=df["id_database"].tolist(),
+        embeddings=df["embeddings"].tolist(),
+        metadatas=df[
+            ["start", "end", "text", "views", "publish_date", "url", "title"]
+        ].to_dict("records"),
+    )  # Add the data from the DataFrame to the ChromaDB collection
+except chromadb.errors.CollectionAlreadyExistsError:
+    collection = client.get_collection("alcalde_bogota")
 
 # Define a function to query the ChromaDB collection for similar text
 def query(text):

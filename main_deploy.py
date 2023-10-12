@@ -31,8 +31,25 @@ st.header(f"¿De qué habla {selected_file}?")
 st.markdown(
     f"A continuación te mostramos las palabras más comunes usadas por el candidato {selected_file} tanto en entrevistas como en debates:"
 )
+
 # Generate and display a word cloud from the preprocessed text data
-st.image(show_wordcloud(file_names, selected_file))
+dict_pos = {
+    'Sustantivo': 'NOUN',
+    'Nombre propio': 'PROPN',
+    'Adjetivo': 'ADJ',
+    'Verbos': 'VERB'
+}
+col1, col2 = st.columns([1, 6])
+with col1:
+    selected = st.multiselect(
+        "Escoja las categorías gramaticales que desea incluir en el wordcloud",
+        options=dict_pos.keys(),
+        default=dict_pos.keys(),
+    )
+    # Get the corresponding values for the selected keys
+    list_pos = [dict_pos[key] for key in selected]
+with col2:
+    st.image(show_wordcloud(file_names, selected_file, list_pos))
 
 # Add a divider and a subheader for the next steps
 st.divider()
