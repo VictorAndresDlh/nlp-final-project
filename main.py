@@ -10,8 +10,8 @@ def generate_wordcloud(file_names, selected_file, list_pos):
 
 
 @st.cache_data
-def generate_query(text):
-    return query(text)
+def generate_query(text, selected_file):
+    return query(text, selected_file)
 
 
 # Configure the Streamlit page layout
@@ -33,6 +33,25 @@ st.title("Elecciones Bogotá 2023 :city_sunset:")
 st.subheader(
     "En este dashboard, podrás explorar los temas más importantes de los candidatos a la alcaldía de Bogotá."
 )
+# Add a divider and a subheader for the next steps
+st.divider()
+st.header(f"¿Qué dice {selected_file} sobre...?")
+text = st.text_input("Escribe un texto para buscar en las entrevistas y debates")
+if text:
+    results, distances = generate_query(text, selected_file)
+    _, col2, _, col4, _, col6, _ = st.columns([1, 5, 1, 5, 1, 5, 1])
+    with col2:
+        st.video(results[0]["webpage_url"])
+        st.markdown(f"'{results[0]['transcribe']}'")
+        st.markdown(f"Distancia usando similaridad de coseno: {distances[0]:.2f}")
+    with col4:
+        st.video(results[1]["webpage_url"])
+        st.markdown(f"'{results[1]['transcribe']}'")
+        st.markdown(f"Distancia usando similaridad de coseno: {distances[1]:.2f}")
+    with col6:
+        st.video(results[2]["webpage_url"])
+        st.markdown(f"'{results[2]['transcribe']}'")
+        st.markdown(f"Distancia usando similaridad de coseno: {distances[2]:.2f}")
 st.divider()
 st.header(f"¿De qué habla {selected_file}?")
 st.markdown(
@@ -69,24 +88,3 @@ with col1:
     else:
         wordcloud = generate_wordcloud(file_names, selected_file, list_pos)
         st.image(wordcloud)
-        #st.markdown("![Alt Text](data:image/png;base64,{})".format(wordcloud))
-
-# Add a divider and a subheader for the next steps
-st.divider()
-st.header(f"¿Qué dice {selected_file} sobre...?")
-text = st.text_input("Escribe un texto para buscar en las entrevistas y debates")
-if text:
-    results, distances = generate_query(text)
-    _, col2, _, col4, _, col6, _ = st.columns([1, 5, 1, 5, 1, 5, 1])
-    with col2:
-        st.markdown(f"'{results[0]['text']}'")
-        st.video(results[0]["url"])
-        st.markdown(f"Distancia usando similaridad de coseno: {distances[0]:.2f}")
-    with col4:
-        st.markdown(f"'{results[1]['text']}'")
-        st.video(results[1]["url"])
-        st.markdown(f"Distancia usando similaridad de coseno: {distances[1]:.2f}")
-    with col6:
-        st.markdown(f"'{results[2]['text']}'")
-        st.video(results[2]["url"])
-        st.markdown(f"Distancia usando similaridad de coseno: {distances[2]:.2f}")
