@@ -38,12 +38,13 @@ st.divider()
 st.header(f"¿Qué dice {selected_file} sobre...?")
 text = st.text_input("Escribe un texto para buscar en las entrevistas y debates")
 if text:
-    results, distances = generate_query(text, selected_file)
+    results, distances, ids = generate_query(text, selected_file)
     _, col2, _, col4, _, col6, _ = st.columns([1, 5, 1, 5, 1, 5, 1])
     with col2:
         st.video(results[0]["webpage_url"])
         st.markdown(f"'{results[0]['transcribe']}'")
         st.markdown(f"Distancia usando similaridad de coseno: {distances[0]:.2f}")
+        st.markdown(f"ID: {ids[0]}")
     with col4:
         st.video(results[1]["webpage_url"])
         st.markdown(f"'{results[1]['transcribe']}'")

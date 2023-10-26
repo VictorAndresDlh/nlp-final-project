@@ -1,23 +1,26 @@
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 import chromadb
-import ast
+from chromadb.utils import embedding_functions
 
 # Load the data from a CSV file and convert the "embeddings" column from a string to a list
 df = pd.read_csv("final.csv")
 
 # Load the pre-trained Sentence Transformer model
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L12-v2")
+sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L12-v2")
 
 # Create a new column to store the embeddings
 df["embeddings"] = model.encode(df['transcribe'], batch_size = 64).tolist()
 df['id_database'] = df.apply(lambda x: str(x.name) + "-" + x['id'], axis=1)
+df = df.drop([5, 65])
 
 # Create a new ChromaDB collection and add the data from the DataFrame to it
 client = chromadb.Client()
 try:
     collection = client.create_collection(
-        name="alcalde_bogota", metadata={"hnsw:space": "cosine"}
+        name="alcalde_bogota", metadata={"hnsw:space": "cosine"},
+        embedding_function=sentence_transformer_ef,
     ) # Create a new ChromaDB collection with the specified name and metadata
     # Create the collection
     collection.add(
@@ -42,9 +45,10 @@ def query(text, selected_file):
     content = collection.query(
         query_texts=[text],  # The text to search for
         n_results=3,  # The number of results to return
-        where = {"candidato": candidatos[selected_file]}
+        where = {"candidato": candidatos[selected_file]},
     )
     return (
         content["metadatas"][0],
         content["distances"][0],
+        content["ids"][0],
     )  # Return the metadata for the matching documents

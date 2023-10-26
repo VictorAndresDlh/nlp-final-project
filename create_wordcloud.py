@@ -15,6 +15,8 @@ def preprocess_text(text, list_pos):
         for token in doc
         if token.pos_ in list_pos  # Only include certain parts of speech
         and token.text.lower()
+        and not token.is_stop  # Exclude stopwords
+        and token.text not in ["bogotá", "ciudad"] # Compare token.text with string and exclude words
     ]
     # Join the extracted tokens into a single string
     return " ".join(words)
