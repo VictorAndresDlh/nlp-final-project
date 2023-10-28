@@ -14,9 +14,15 @@ def generate_wordcloud(file_names, selected_file, list_pos):
     return show_wordcloud(file_names, selected_file, list_pos)
 
 
+# Define a function to generate the query
 @st.cache_data
 def generate_query(text, selected_file):
     return query(text, selected_file)
+
+
+# Define a function to highlight the word in the text
+def highlight(text, word):
+    return text.replace(word, f'<span style="color:orange">{word}</span>')
 
 
 # Configure the Streamlit page layout
@@ -24,7 +30,6 @@ st.set_page_config(layout="wide")
 st.set_option("deprecation.showPyplotGlobalUse", False)
 
 # Add a sidebar for selecting a candidate file
-st.sidebar.title("Configuración")
 file_names = {
     "Juan Daniel Oviedo": "oviedo.txt",
     "Carlos Fernando Galán": "galan.txt",
@@ -41,22 +46,35 @@ st.subheader(
 # Add a divider and a subheader for the next steps
 st.divider()
 st.header(f"¿Qué dice {selected_file} sobre...?")
-text = st.text_input("Escribe un texto para buscar en las entrevistas y debates")
+text = st.text_input("Escribe un texto para buscar en las entrevistas y debates:")
+distance = 0.8
 if text:
-    results, distances = generate_query(text, selected_file)
+    results, distances, ids = generate_query(text, selected_file)
     _, col2, _, col4, _, col6, _ = st.columns([1, 5, 1, 5, 1, 5, 1])
     with col2:
-        st.video(results[0]["webpage_url"])
-        st.markdown(f"'{results[0]['transcribe']}'")
-        st.markdown(f"Distancia usando similaridad de coseno: {distances[0]:.2f}")
+        if distances[0] < distance:
+            response = f"'{results[0]['transcribe']}'"
+            st.video(results[0]["webpage_url"], start_time=results[0]["start_time"])
+            st.markdown(highlight(response, text), unsafe_allow_html=True)
+            st.markdown(f"Distancia usando similaridad de coseno: {distances[0]:.3f}")
+        else:
+            st.error("No se encontró ninguna coincidencia relevante")
     with col4:
-        st.video(results[1]["webpage_url"])
-        st.markdown(f"'{results[1]['transcribe']}'")
-        st.markdown(f"Distancia usando similaridad de coseno: {distances[1]:.2f}")
+        if distances[1] < distance:
+            response = f"'{results[1]['transcribe']}'"
+            st.video(results[1]["webpage_url"], start_time=results[1]["start_time"])
+            st.markdown(highlight(response, text), unsafe_allow_html=True)
+            st.markdown(f"Distancia usando similaridad de coseno: {distances[1]:.3f}")
+        else:
+            st.error("No se encontró ninguna coincidencia relevante")
     with col6:
-        st.video(results[2]["webpage_url"])
-        st.markdown(f"'{results[2]['transcribe']}'")
-        st.markdown(f"Distancia usando similaridad de coseno: {distances[2]:.2f}")
+        if distances[2] < distance:
+            response = f"'{results[2]['transcribe']}'"
+            st.video(results[2]["webpage_url"], start_time=results[2]["start_time"])
+            st.markdown(highlight(response, text), unsafe_allow_html=True)
+            st.markdown(f"Distancia usando similaridad de coseno: {distances[2]:.3f}")
+        else:
+            st.error("No se encontró ninguna coincidencia relevante")
 st.divider()
 st.header(f"¿De qué habla {selected_file}?")
 st.markdown(
@@ -93,4 +111,5 @@ with col1:
     else:
         wordcloud = generate_wordcloud(file_names, selected_file, list_pos)
         st.image(wordcloud)
+
 
